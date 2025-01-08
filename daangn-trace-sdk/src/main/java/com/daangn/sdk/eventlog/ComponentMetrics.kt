@@ -12,7 +12,7 @@ class ComponentMetrics {
      * TraceButton 클릭 이벤트 로깅
      * @param buttonId 버튼 식별자
      */
-    suspend fun logButtonClick(buttonId: String) {
+    suspend fun logButtonClick(buttonId: Int) {
         val event = TraceEvent(
             type = EventType.BUTTON_CLICK,
             timestamp = System.currentTimeMillis(),
