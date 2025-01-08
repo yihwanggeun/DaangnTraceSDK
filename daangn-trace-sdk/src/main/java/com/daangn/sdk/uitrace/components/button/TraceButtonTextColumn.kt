@@ -27,6 +27,7 @@ import com.daangn.sdk.uitrace.theme.DaangnTheme
  */
 @Composable
 fun TraceButtonTextColumn(
+    id : Int,
     modifier : Modifier = Modifier,
     title : String,
     @DrawableRes icon: Int,
@@ -38,6 +39,7 @@ fun TraceButtonTextColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
         TraceButton(
+            id = id,
             modifier = modifier,
             iconSize = size,
             icon = icon,

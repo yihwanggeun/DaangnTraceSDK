@@ -8,6 +8,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -15,6 +20,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.daangn.sdk.R
+import com.daangn.sdk.eventlog.ComponentMetrics
 import com.daangn.sdk.uitrace.theme.DaangnTheme
 
 /**
@@ -28,6 +34,7 @@ import com.daangn.sdk.uitrace.theme.DaangnTheme
  */
 @Composable
 fun TraceButton(
+    id : Int,
     modifier : Modifier = Modifier,
     iconSize : Int,
     @DrawableRes icon: Int,
@@ -35,13 +42,25 @@ fun TraceButton(
     onButtonClick : () -> Unit = {},
 ){
     val buttonSize = iconSize + 16;
+    val metrics = remember { ComponentMetrics() }
+    var shouldLogClick by remember { mutableStateOf(false) }
+
+    LaunchedEffect(shouldLogClick) {
+        if (shouldLogClick) {
+            metrics.logButtonClick(id)
+            shouldLogClick = false
+        }
+    }
     Button(
         modifier = modifier.size(buttonSize.dp),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
         ),
-        onClick = onButtonClick,
+        onClick = {
+            onButtonClick()
+            shouldLogClick = true  // 클릭 시 로깅 트리거
+        },
         contentPadding = PaddingValues(0.dp)
     ){
         Icon(
@@ -60,6 +79,7 @@ fun TraceButton(
 fun TraceButtonPreview(){
     DaangnTheme {
         TraceButton(
+            id = 0,
             modifier = Modifier,
             iconSize = 60,
             icon = R.drawable.ic_category_camera_24,
