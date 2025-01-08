@@ -1,11 +1,8 @@
 package com.daangn.sdk.uitrace.components.button
 
-import android.graphics.drawable.Icon
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -14,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.daangn.sdk.R
 import com.daangn.sdk.uitrace.theme.DaangnTheme
 
 /**
@@ -27,6 +23,7 @@ import com.daangn.sdk.uitrace.theme.DaangnTheme
  */
 @Composable
 fun TraceButtonTextColumn(
+    id : Int,
     modifier : Modifier = Modifier,
     title : String,
     @DrawableRes icon: Int,
@@ -38,6 +35,7 @@ fun TraceButtonTextColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
         TraceButton(
+            id = id,
             modifier = modifier,
             iconSize = size,
             icon = icon,

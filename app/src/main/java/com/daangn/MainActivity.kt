@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.daangn.sdk.R
+import com.daangn.sdk.core.TraceManager
 import com.daangn.sdk.uitrace.components.button.TraceButtonTextColumn
 import com.daangn.sdk.uitrace.components.button.TraceList
 import com.daangn.sdk.uitrace.theme.DaangnTheme
@@ -289,7 +290,10 @@ class MainActivity : ComponentActivity() {
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+        TraceManager.initialize(this)
+
         setContent {
             DaangnTheme {
                 Column(
@@ -326,6 +330,7 @@ class MainActivity : ComponentActivity() {
                         items(count = buttonItems.size, itemContent = { index ->
                             val item = buttonItems[index]
                             TraceButtonTextColumn(
+                                id = index,
                                 modifier = Modifier.padding(4.dp),
                                 title = item.title,
                                 icon = item.icon,
