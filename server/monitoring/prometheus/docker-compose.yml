@@ -1,0 +1,51 @@
+services:
+  app:
+    build: 
+      context: ../..
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+    volumes:
+      - ../../src:/usr/src/app/src
+      - ../../node_modules:/usr/src/app/node_modules
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/metrics-db
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-mongodb-datasource
+
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  mongodb_data:
