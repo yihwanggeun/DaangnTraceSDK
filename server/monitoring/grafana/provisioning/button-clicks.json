@@ -1,0 +1,52 @@
+{
+    "dashboard": {
+      "id": null,
+      "title": "Button Click Analytics Dashboard",
+      "panels": [
+        {
+          "title": "Total Button Clicks",
+          "type": "stat",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "sum(app_button_clicks_total)",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "Button Clicks by ID",
+          "type": "graph",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "sum(app_button_clicks_by_id) by (buttonId)",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "Button Clicks Rate (per minute)",
+          "type": "graph",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(app_button_clicks_total[1m])",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "Processing Latency",
+          "type": "graph",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(app_button_click_processing_duration_seconds_sum[5m]) / rate(app_button_click_processing_duration_seconds_count[5m])",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }
+  }
