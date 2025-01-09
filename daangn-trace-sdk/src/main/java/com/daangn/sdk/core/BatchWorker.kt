@@ -6,7 +6,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.daangn.sdk.data.model.Event
+import com.daangn.sdk.data.network.RetrofitClient
 import com.daangn.sdk.eventlog.EventProcessor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * 주기적으로 실행되는 배치 작업을 처리하는 Worker 클래스
@@ -16,37 +20,39 @@ class BatchWorker(
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
 
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            Log.d("BatchWorker", "=== 배치 작업 시작 ===")
-            Log.d("BatchWorker", "Worker ID: ${this.id}")
+            Log.d(TAG, "=== 배치 작업 시작 ===")
 
-            val eventCount = EventProcessor.eventQueue.size
-            Log.d("BatchWorker", "처리할 이벤트 수: $eventCount")
-
-            // 이벤트 큐에서 이벤트들을 가져와서 로그로 출력
-            EventProcessor.eventQueue.forEach { event ->
-                Log.d("BatchWorker", """
-               처리된 이벤트:
-               타입: ${event.type}
-               시간: ${event.timestamp}
-               메타데이터: ${event.metadata}
-               Thread: ${Thread.currentThread().name}
-           """.trimIndent())
+            val events = EventProcessor.eventQueue.map { event ->
+                Event(
+                    type = event.type.toString(),
+                    timestamp = event.timestamp,
+                    metadata = event.metadata.mapValues { it.value.toString() }
+                )
             }
 
-            // 처리 완료된 이벤트들 삭제
-            val queueSizeBefore = EventProcessor.eventQueue.size
-            EventProcessor.eventQueue.clear()
-            val queueSizeAfter = EventProcessor.eventQueue.size
+            if (events.isEmpty()) {
+                Log.d(TAG, "처리할 이벤트 없음")
+                return@withContext Result.success()
+            }
 
-            Log.d("BatchWorker", "큐 크기 변화: $queueSizeBefore -> $queueSizeAfter")
-            Log.d("BatchWorker", "=== 배치 작업 완료 ===")
-            return Result.success()
+            val response = RetrofitClient.apiService.sendEvents(events)
+            Log.d(TAG, "서버 응답: $response")
+
+            // 성공적으로 전송된 이벤트 제거
+            EventProcessor.eventQueue.clear()
+
+            Log.d(TAG, "=== 배치 작업 완료 ===")
+            Result.success()
+
         } catch (e: Exception) {
-            Log.e("BatchWorker", "=== 배치 작업 실패 ===")
-            Log.e("BatchWorker", "에러 메시지: ${e.message}")
-            return Result.failure()
+            Log.e(TAG, "배치 작업 실패: ${e.message}", e)
+            Result.retry()
         }
     }
+        companion object {
+        private const val TAG = "BatchWorker"
+    }
 }
+
