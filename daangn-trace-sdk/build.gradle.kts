@@ -39,6 +39,21 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    libraryVariants.all {
+        outputs.all {
+            if (this is com.android.build.gradle.internal.api.LibraryVariantOutputImpl) {
+                outputFileName = "daangn-trace-sdk-1.0.0.aar"
+            }
+        }
+    }
+}
+
+tasks.register<Copy>("copyAarToLibs") {
+    from("build/outputs/aar")
+    into("${rootProject.projectDir}/libs")
+    include("*.aar")
+    rename { "daangn-trace-sdk.aar" }
 }
 
 dependencies {
@@ -52,7 +67,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    implementation("androidx.work:work-runtime-ktx:2.10.0")
+    implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -63,7 +78,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation (libs.kotlinx.serialization.json)
-    implementation ("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation (libs.retrofit2.kotlinx.serialization.converter)
+    implementation (libs.retrofit)
     implementation(libs.coil)
 }

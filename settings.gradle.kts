@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "DaangnTraceSDK"
 include(":app")
-include(":daangn-trace-sdk")
